@@ -155,6 +155,7 @@
             border-radius: 10px;
             margin-bottom: 10px;
         }
+
         /* Bin Display */
         .bin-container {
             display: flex;
@@ -243,19 +244,21 @@
             <!-- Bin Section -->
             <div class="bin-container">
                 <div class="bin" id="recycleBin">
-                    <img src="./recycle_bin.jpg" alt="Recycle Bin">
+                    <img src="{{ url_for('static', filename='images/recycle_bin.jpg') }}" alt="Recycle Bin">
                     <p>Recycle Bin</p>
                 </div>
                 <div class="bin" id="hazardousBin">
-                    <img src="./hazardous_bin.jpg" alt="Hazardous Bin">
+                    <img src="{{ url_for('static', filename='images/hazardous_bin.jpg') }}" alt="Hazardous Bin">
                     <p>Hazardous Bin</p>
                 </div>
                 <div class="bin" id="foodWasteBin">
-                    <img src="./food_waste_bin.jpg" alt="Food Waste Bin">
+                    <img src="{{ url_for('static', filename='images/food_waste_bin.jpg') }}" alt="Food Waste Bin">
                     <p>Food Waste Bin</p>
                 </div>
             </div>
         </section>
+
+
     </div>
 
     <script>
@@ -297,20 +300,40 @@
 
             // Display the prediction result
             predictionResult.textContent = data.result;
-            
+            const s = data.result;
+            let s1 = "";
+            for (let i = 9; i < 30; i++) {
+                if (s[i] == " ") {
+                    break;
+                }
+                s1 = s1 + s[i];
+            }
+
 
             // Determine which bin to show based on prediction
-            const wasteType = data.result.toLowerCase();
+            const wasteType = s1.toLowerCase();
             recycleBin.style.display = 'none';
             hazardousBin.style.display = 'none';
             foodWasteBin.style.display = 'none';
 
-            if (['metal', 'paper', 'plastic', 'glass', 'cardboard'].includes(wasteType)) {
+            let cat = ["metal", "paper", "plastic", "glass", "cardboard"];
+            let b = false;
+            for (let i = 0; i < 5; i++) {
+                if (cat[i] == wasteType) {
+                    b = true;
+                }
+
+            }
+            if (b) {
                 recycleBin.style.display = 'flex';
-            } else if (wasteType === 'battery') {
-                hazardousBin.style.display = 'flex';
-            } else if (wasteType === 'food_waste') {
-                foodWasteBin.style.display = 'flex';
+            }
+            else {
+                if (wasteType == "battery") {
+                    hazardousBin.style.display = 'flex';
+                }
+                else if (wasteType == "food_waste") {
+                    foodWasteBin.style.display = 'flex';
+                }
             }
         });
 
@@ -323,7 +346,9 @@
 
         // Start camera when button is clicked
         startCameraButton.addEventListener('click', () => {
-            navigator.mediaDevices.getUserMedia({ video: true })
+            navigator.mediaDevices.getUserMedia({ video: {
+                facingMode: {ideal: 'environment'}
+            } })
                 .then((stream) => {
                     video.srcObject = stream;
                     video.style.display = 'block';
@@ -359,11 +384,48 @@
                     body: formData
                 });
                 const data = await response.json();
-
+                const resm = document.getElementById('resm');
+                resm.removeAttribute('hidden');
                 // Display the captured image and prediction result
                 uploadedImage.src = canvas.toDataURL();
                 uploadedImage.style.display = 'block';
                 predictionResult.textContent = data.result;
+                const s = data.result;
+                let s1 = "";
+                for (let i = 9; i < 30; i++) {
+                    if (s[i] == " ") {
+                        break;
+                    }
+                    s1 = s1 + s[i];
+                }
+
+
+                // Determine which bin to show based on prediction
+                const wasteType = s1.toLowerCase();
+                recycleBin.style.display = 'none';
+                hazardousBin.style.display = 'none';
+                foodWasteBin.style.display = 'none';
+
+                let cat = ["metal", "paper", "plastic", "glass", "cardboard"];
+                let b = false;
+                for (let i = 0; i < 5; i++) {
+                    if (cat[i] == wasteType) {
+                        b = true;
+                    }
+
+                }
+                if (b) {
+                    recycleBin.style.display = 'flex';
+                }
+                else {
+                    if (wasteType == "battery") {
+                        hazardousBin.style.display = 'flex';
+                    }
+                    else if (wasteType == "food_waste") {
+                        foodWasteBin.style.display = 'flex';
+                    }
+                }
+
             });
         });
 
