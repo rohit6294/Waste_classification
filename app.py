@@ -50,4 +50,5 @@ def predict():
     result = f'Image is {predicted_class} with accuracy of {accuracy:.2f}%'
     return jsonify({'result': result})
 
-
+if __name__ == '__main__':
+    app.run(debug=True)
